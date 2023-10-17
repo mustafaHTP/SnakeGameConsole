@@ -212,14 +212,15 @@ namespace SnakeGame
                         cancellationTokenSource.Cancel();
                         break;
                     case ConsoleKey.Spacebar:
-                        _isBoostMode = !_isBoostMode;
                         if (!_isBoostMode)
                         {
                             _gameDelayAmount = _gameBoostDelay;
+                            _isBoostMode = true;
                         }
                         else
                         {
                             _gameDelayAmount = _gameDefaultDelay;
+                            _isBoostMode = false;
                         }
                         break;
                 }
