@@ -104,6 +104,10 @@ namespace SnakeGameConsole
             Console.ResetColor();
         }
 
+        /*
+         * The snake figure : https://www.asciiart.eu/animals/reptiles/snakes
+         * The snake title : https://ascii.co.uk/art/snake 
+         * **/
         internal static void DrawSnakeHeader(int borderX)
         {
             Console.ForegroundColor = ConsoleColor.Green;
