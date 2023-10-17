@@ -164,14 +164,9 @@ namespace SnakeGame
 
         private async Task GetInputAsync()
         {
-            ConsoleKey snakeDirectionInput = default;
-
             while (!cancellationTokenSource.Token.IsCancellationRequested)
             {
-                if (Console.KeyAvailable)
-                {
-                    snakeDirectionInput = Console.ReadKey(true).Key;
-                }
+                ConsoleKey snakeDirectionInput = Console.ReadKey(true).Key;
 
                 switch (snakeDirectionInput)
                 {
