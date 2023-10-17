@@ -10,4 +10,6 @@ Basic snake game in C#
 
 ***Move snake*** ***=>*** ``Up``, ``Down``, ``Left``, ``Right Arrow``
 
+***Toggle Boost Mode*** ***=>*** ``Space``
+
 ***To Quit*** => ``Q``
