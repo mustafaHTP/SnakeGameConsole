@@ -10,6 +10,10 @@ namespace SnakeGame
         private const int BorderWidth = 60;
         private const int BorderHeight = 20;
 
+        //CONSOLE CONSTANTS
+        private const int ConsoleBufferWidth = 200;
+        private const int ConsoleBufferHeight = 200;
+
         //CHAR CONSTANTS
         /*
          * More details about special characters
@@ -24,8 +28,8 @@ namespace SnakeGame
          * Values that between 50 and 100 are fine 
          * for smooth gameplay
          * **/
-        private const int _gameDefaultDelay = 75;
-        private const int _gameBoostDelay = _gameDefaultDelay / 3;
+        private const int GameDefaultDelay = 75;
+        private const int GameBoostDelay = GameDefaultDelay / 3;
 
         private LinkedList<SnakeBodyPart> _snakeBodyParts;
         /*
@@ -48,8 +52,7 @@ namespace SnakeGame
         private void SetupGame()
         {
             Console.Clear();
-            Console.BufferWidth = 200;
-            Console.BufferHeight = 200;
+            Console.SetBufferSize(ConsoleBufferWidth, ConsoleBufferHeight);
 
             //SNAKE DEFAULT VALUES
             //Get random position for snake at start
@@ -82,7 +85,7 @@ namespace SnakeGame
             cancellationTokenSource = new();
 
             //GAME DEFAULT DELAY
-            _gameDelayAmount = _gameDefaultDelay;
+            _gameDelayAmount = GameDefaultDelay;
 
             _isBoostMode = false;
         }
@@ -214,12 +217,12 @@ namespace SnakeGame
                     case ConsoleKey.Spacebar:
                         if (!_isBoostMode)
                         {
-                            _gameDelayAmount = _gameBoostDelay;
+                            _gameDelayAmount = GameBoostDelay;
                             _isBoostMode = true;
                         }
                         else
                         {
-                            _gameDelayAmount = _gameDefaultDelay;
+                            _gameDelayAmount = GameDefaultDelay;
                             _isBoostMode = false;
                         }
                         break;
