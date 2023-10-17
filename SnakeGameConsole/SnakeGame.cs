@@ -15,9 +15,17 @@ namespace SnakeGame
          * More details about special characters
          * https://theasciicode.com.ar/extended-ascii-code/bottom-half-block-ascii-code-220.html
          * **/
-        private const char BorderChar = '▄'; 
+        private const char BorderChar = '▄';
         private const char FoodChar = '@';
         private const char SnakeBodyChar = '■';
+
+        //GAME DELAY CONSTANTS
+        /*
+         * Values that between 50 and 100 are fine 
+         * for smooth gameplay
+         * **/
+        private const int _gameDefaultDelay = 75;
+        private const int _gameBoostDelay = _gameDefaultDelay / 3;
 
         private LinkedList<SnakeBodyPart> _snakeBodyParts;
         /*
@@ -28,18 +36,12 @@ namespace SnakeGame
          * we must keep the last part holded.
          * **/
         private SnakeBodyPart _lastRemovedTail;
-
         private Food _food;
-
         private Direction _currentDirection;
 
         private int _userScore;
-
-        /*
-         * Values that between 50 and 100 are fine 
-         * for smooth gameplay
-         * **/
-        private const int _gameDelayAmount = 75;
+        private int _gameDelayAmount;
+        private bool _isBoostMode;
 
         private CancellationTokenSource cancellationTokenSource;
 
@@ -49,8 +51,7 @@ namespace SnakeGame
             Console.BufferWidth = 200;
             Console.BufferHeight = 200;
 
-            //Snake Initial Values
-
+            //SNAKE DEFAULT VALUES
             //Get random position for snake at start
             Random snakeBodyPartSpawner = new();
             int snakeBodyPartStartPointX = snakeBodyPartSpawner.Next(BorderX + 1, BorderX + BorderWidth - 1);
@@ -67,10 +68,10 @@ namespace SnakeGame
             //Spawn food at startup
             SpawnFood();
 
-            //Score Initial Values
+            //SCORE DEFAULT VALUE
             _userScore = 0;
 
-            //Direction Initial Values
+            //DIRECTION DEFAULT VALUE
             _currentDirection = Direction.Right;
 
             //Cancellation Token Source
@@ -79,8 +80,13 @@ namespace SnakeGame
              * it sets the token to a canceled state, and this state is irreversible.
              * That's why we need to recreate the new one after the game ends**/
             cancellationTokenSource = new();
+
+            //GAME DEFAULT DELAY
+            _gameDelayAmount = _gameDefaultDelay;
+
+            _isBoostMode = false;
         }
-    
+
         private void MoveSnake(Direction snakeDirection)
         {
             //Fetch cursor to last part of snake
@@ -166,7 +172,11 @@ namespace SnakeGame
         {
             while (!cancellationTokenSource.Token.IsCancellationRequested)
             {
-                ConsoleKey snakeDirectionInput = Console.ReadKey(true).Key;
+                ConsoleKey snakeDirectionInput = default;
+                if (Console.KeyAvailable)
+                {
+                    snakeDirectionInput = Console.ReadKey(true).Key;
+                }
 
                 switch (snakeDirectionInput)
                 {
@@ -201,6 +211,17 @@ namespace SnakeGame
                     case ConsoleKey.Q:
                         cancellationTokenSource.Cancel();
                         break;
+                    case ConsoleKey.Spacebar:
+                        _isBoostMode = !_isBoostMode;
+                        if (!_isBoostMode)
+                        {
+                            _gameDelayAmount = _gameBoostDelay;
+                        }
+                        else
+                        {
+                            _gameDelayAmount = _gameDefaultDelay;
+                        }
+                        break;
                 }
 
                 await Task.Delay(_gameDelayAmount);
@@ -214,7 +235,7 @@ namespace SnakeGame
                 //PrintDebugInfo();
                 ConsoleHelper.DrawSnakeHeader(BorderX);
                 ConsoleHelper.DrawBorder(BorderX, BorderY, BorderWidth, BorderHeight, BorderChar);
-                ConsoleHelper.DrawSnakeBody(_snakeBodyParts, SnakeBodyChar, _currentDirection);
+                ConsoleHelper.DrawSnakeBody(_snakeBodyParts, SnakeBodyChar, _currentDirection, _isBoostMode);
 
                 if (_food.FoodEaten)
                 {

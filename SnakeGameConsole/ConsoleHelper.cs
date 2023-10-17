@@ -46,11 +46,15 @@ namespace SnakeGameConsole
             Console.ForegroundColor = ConsoleColor.White;
         }
 
-        internal static void DrawSnakeBody(LinkedList<SnakeBodyPart> snakeBodyParts, char snakeBodyChar, Direction direction)
+        internal static void DrawSnakeBody(LinkedList<SnakeBodyPart> snakeBodyParts, char snakeBodyChar, Direction direction, bool isBoostMode)
         {
             SnakeBodyPart head = snakeBodyParts.First();
             Console.SetCursorPosition(head.X, head.Y);
-            Console.ForegroundColor = ConsoleColor.Green;
+            Console.ForegroundColor = isBoostMode switch
+            {
+                true => ConsoleColor.Magenta,
+                _ => ConsoleColor.Green
+            };
 
             switch (direction)
             {
