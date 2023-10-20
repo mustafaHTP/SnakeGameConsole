@@ -111,6 +111,7 @@ namespace SnakeGameConsole
         internal static void DrawSnakeHeader(int borderX)
         {
             Console.ForegroundColor = ConsoleColor.Green;
+            Console.SetCursorPosition(0, 0);
 
             WriteSpace(borderX);
             Console.Write("           ____              \n");

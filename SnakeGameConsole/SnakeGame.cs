@@ -234,11 +234,12 @@ namespace SnakeGame
 
         private async Task GameLoopAsync()
         {
+            ConsoleHelper.DrawSnakeHeader(BorderX);
+            ConsoleHelper.DrawBorder(BorderX, BorderY, BorderWidth, BorderHeight, BorderChar);
+
             while (!cancellationTokenSource.Token.IsCancellationRequested)
             {
                 //PrintDebugInfo();
-                ConsoleHelper.DrawSnakeHeader(BorderX);
-                ConsoleHelper.DrawBorder(BorderX, BorderY, BorderWidth, BorderHeight, BorderChar);
                 ConsoleHelper.DrawSnakeBody(_snakeBodyParts, SnakeBodyChar, _currentDirection, _isBoostMode);
 
                 if (_food.FoodEaten)
@@ -257,7 +258,6 @@ namespace SnakeGame
                 }
 
                 HaveFoodEaten();
-                Console.Clear();
             }
 
         }
@@ -271,6 +271,7 @@ namespace SnakeGame
                 ConsoleHelper.PrintStartGame(BorderX, BorderY, BorderWidth, BorderHeight, BorderChar);
 
                 ConsoleKey startInput = Console.ReadKey(true).Key;
+                Console.Clear();
 
                 var getInputTask = GetInputAsync();
                 var gameLoopTask = GameLoopAsync();
