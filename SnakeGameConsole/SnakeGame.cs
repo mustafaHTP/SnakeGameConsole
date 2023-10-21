@@ -100,26 +100,27 @@ namespace SnakeGame
 
             //Move head according to direction
             SnakeBodyPart firstSnakeBodyPart = _snakeBodyParts.First();
+            int newSnakeHeadX = firstSnakeBodyPart.X;
+            int newSnakeHeadY = firstSnakeBodyPart.Y;
 
             switch (snakeDirection)
             {
                 case Direction.Up:
-                    Console.SetCursorPosition(firstSnakeBodyPart.X, firstSnakeBodyPart.Y - 1);
-                    _snakeBodyParts.AddFirst(new SnakeBodyPart { X = firstSnakeBodyPart.X, Y = firstSnakeBodyPart.Y - 1 });
+                    newSnakeHeadY -= 1;
                     break;
                 case Direction.Down:
-                    Console.SetCursorPosition(firstSnakeBodyPart.X, firstSnakeBodyPart.Y + 1);
-                    _snakeBodyParts.AddFirst(new SnakeBodyPart { X = firstSnakeBodyPart.X, Y = firstSnakeBodyPart.Y + 1 });
+                    newSnakeHeadY += 1;
                     break;
                 case Direction.Left:
-                    Console.SetCursorPosition(firstSnakeBodyPart.X - 1, firstSnakeBodyPart.Y);
-                    _snakeBodyParts.AddFirst(new SnakeBodyPart { X = firstSnakeBodyPart.X - 1, Y = firstSnakeBodyPart.Y });
+                    newSnakeHeadX -= 1;
                     break;
                 case Direction.Right:
-                    Console.SetCursorPosition(firstSnakeBodyPart.X + 1, firstSnakeBodyPart.Y);
-                    _snakeBodyParts.AddFirst(new SnakeBodyPart { X = firstSnakeBodyPart.X + 1, Y = firstSnakeBodyPart.Y });
+                    newSnakeHeadX += 1;
                     break;
             }
+
+            //Add new snake head based on direction
+            _snakeBodyParts.AddFirst(new SnakeBodyPart { X = newSnakeHeadX, Y = newSnakeHeadY});
 
             //Pop last part of snake body
             _lastRemovedTail = _snakeBodyParts.Last();
