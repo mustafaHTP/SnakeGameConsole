@@ -145,7 +145,7 @@ namespace SnakeGameConsole
         internal static void PrintGameOver(int borderX, int borderY, int borderWidth, int borderHeight, char borderChar, int score)
         {
             Console.Clear();
-            ConsoleHelper.DrawBorder(borderX, borderY, borderWidth, borderHeight, borderChar);
+            DrawBorder(borderX, borderY, borderWidth, borderHeight, borderChar);
 
             int middleOfBorderX = (borderX + borderWidth - 1) / 2;
             int middleOfBorderY = (borderY + borderHeight) / 2;
@@ -156,27 +156,27 @@ namespace SnakeGameConsole
                 middleOfBorderX - gameOverText.Length / 2,
                 middleOfBorderY
                 );
-            ConsoleHelper.WriteWithColor(gameOverText, ConsoleColor.Red);
+            WriteWithColor(gameOverText, ConsoleColor.Red);
 
             string userScore = "Score: " + score;
             Console.SetCursorPosition(
                 middleOfBorderX - userScore.Length / 2,
                 middleOfBorderY + 2
                 );
-            ConsoleHelper.WriteWithColor(userScore, ConsoleColor.Green);
+            WriteWithColor(userScore, ConsoleColor.Green);
 
             string tryAgainText = "Try Again ? : Y/N";
             Console.SetCursorPosition(
                 middleOfBorderX - tryAgainText.Length / 2,
                 middleOfBorderY + 4
                 );
-            ConsoleHelper.WriteWithColor(tryAgainText, ConsoleColor.Yellow);
+            WriteWithColor(tryAgainText, ConsoleColor.Yellow);
         }
 
         internal static void PrintStartGame(int borderX, int borderY, int borderWidth, int borderHeight, char borderChar)
         {
             Console.Clear();
-            ConsoleHelper.DrawBorder(borderX, borderY, borderWidth, borderHeight, borderChar);
+            DrawBorder(borderX, borderY, borderWidth, borderHeight, borderChar);
 
             int middleOfBorderX = (borderX + borderWidth) / 2 + 3;
             int middleOfBorderY = (borderY + borderHeight) / 2;
@@ -187,8 +187,34 @@ namespace SnakeGameConsole
                 middleOfBorderX - startGameText.Length / 2,
                 middleOfBorderY
                 );
-            ConsoleHelper.WriteWithColor(startGameText, ConsoleColor.Green);
+            WriteWithColor(startGameText, ConsoleColor.Green);
         }
 
+        internal static void PrintPauseGame(int borderX, int borderY, int borderWidth, int borderHeight, char borderChar)
+        {
+            Console.Clear();
+            DrawBorder(borderX, borderY, borderWidth, borderHeight, borderChar);
+
+            int middleOfBorderX = (borderX + borderWidth) / 2 + 3;
+            int middleOfBorderY = (borderY + borderHeight) / 2;
+
+            string pauseGameText = "...PAUSED...";
+
+            Console.SetCursorPosition(
+                middleOfBorderX - pauseGameText.Length / 2,
+                middleOfBorderY
+                );
+
+            WriteWithColor(pauseGameText, ConsoleColor.Blue);
+
+            string pauseGameText2 = "Press P to Continue";
+
+            Console.SetCursorPosition(
+                middleOfBorderX - pauseGameText2.Length / 2,
+                middleOfBorderY + 1
+                );
+
+            WriteWithColor(pauseGameText2, ConsoleColor.Blue);
+        }
     }
 }

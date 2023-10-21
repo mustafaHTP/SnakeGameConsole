@@ -46,6 +46,7 @@ namespace SnakeGame
         private int _userScore;
         private int _gameDelayAmount;
         private bool _isBoostMode;
+        private bool _isPaused;
 
         private CancellationTokenSource cancellationTokenSource;
 
@@ -88,6 +89,7 @@ namespace SnakeGame
             _gameDelayAmount = GameDefaultDelay;
 
             _isBoostMode = false;
+            _isPaused = false;
         }
 
         private void MoveSnake(Direction snakeDirection)
@@ -120,7 +122,7 @@ namespace SnakeGame
             }
 
             //Add new snake head based on direction
-            _snakeBodyParts.AddFirst(new SnakeBodyPart { X = newSnakeHeadX, Y = newSnakeHeadY});
+            _snakeBodyParts.AddFirst(new SnakeBodyPart { X = newSnakeHeadX, Y = newSnakeHeadY });
 
             //Pop last part of snake body
             _lastRemovedTail = _snakeBodyParts.Last();
@@ -227,6 +229,9 @@ namespace SnakeGame
                             _isBoostMode = false;
                         }
                         break;
+                    case ConsoleKey.P:
+                        _isPaused = !_isPaused;
+                        break;
                 }
 
                 await Task.Delay(_gameDelayAmount);
@@ -240,8 +245,25 @@ namespace SnakeGame
 
             while (!cancellationTokenSource.Token.IsCancellationRequested)
             {
-                //PrintDebugInfo();
                 ConsoleHelper.DrawSnakeBody(_snakeBodyParts, SnakeBodyChar, _currentDirection, _isBoostMode);
+
+                if (_isPaused)
+                {
+                    ConsoleHelper.PrintPauseGame(BorderX, BorderY, BorderWidth, BorderHeight, BorderChar);
+
+                    //Keep take input until user press P key
+                    ConsoleKey pauseInput;
+                    do
+                    {
+                        pauseInput = Console.ReadKey(true).Key;
+                    } while (pauseInput != ConsoleKey.P);
+
+                    _isPaused = false;
+
+                    Console.Clear();
+                    ConsoleHelper.DrawSnakeHeader(BorderX);
+                    ConsoleHelper.DrawBorder(BorderX, BorderY, BorderWidth, BorderHeight, BorderChar);
+                }
 
                 if (_food.FoodEaten)
                 {
@@ -271,7 +293,8 @@ namespace SnakeGame
                 SetupGame();
                 ConsoleHelper.PrintStartGame(BorderX, BorderY, BorderWidth, BorderHeight, BorderChar);
 
-                ConsoleKey startInput = Console.ReadKey(true).Key;
+                //To block thread at start screen
+                Console.ReadKey(true);
                 Console.Clear();
 
                 var getInputTask = GetInputAsync();
