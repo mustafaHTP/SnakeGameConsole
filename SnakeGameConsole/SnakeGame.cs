@@ -164,6 +164,7 @@ namespace SnakeGame
                 _food.FoodEaten = true;
                 ++_userScore;
                 _snakeBodyParts.AddLast(_lastRemovedTail);
+                AudioHelper.PlayEatEffect();
             }
         }
 
@@ -297,11 +298,14 @@ namespace SnakeGame
                 Console.ReadKey(true);
                 Console.Clear();
 
+                AudioHelper.PlayStartGameEffect();
+
                 var getInputTask = GetInputAsync();
                 var gameLoopTask = GameLoopAsync();
 
                 await Task.WhenAll(gameLoopTask, getInputTask);
 
+                AudioHelper.PlayGameOverEffect();
                 ConsoleHelper.PrintGameOver(BorderX, BorderY, BorderWidth, BorderHeight, BorderChar, _userScore);
 
                 ConsoleKey tryAgainInput = Console.ReadKey(true).Key;
