@@ -84,6 +84,15 @@ namespace SnakeGameConsole
             WriteWithColor(foodChar, ConsoleColor.Yellow);
         }
 
+        internal static void DrawObstacles(LinkedList<Obstacle> obstacles, char obstacleChar)
+        {
+            foreach (var obstacle in obstacles)
+            {
+                Console.SetCursorPosition(obstacle.X, obstacle.Y);
+                WriteWithColor(obstacleChar, ConsoleColor.Magenta);
+            }
+        }
+
         internal static void WriteWithColor(string text, ConsoleColor color)
         {
             Console.ForegroundColor = color;

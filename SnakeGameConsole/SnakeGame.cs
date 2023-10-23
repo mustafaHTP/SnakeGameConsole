@@ -22,6 +22,7 @@ namespace SnakeGame
         private const char BorderChar = '▄';
         private const char FoodChar = '@';
         private const char SnakeBodyChar = '■';
+        private const char ObstacleChar = '▄';
 
         //GAME DELAY CONSTANTS
         /*
@@ -40,13 +41,17 @@ namespace SnakeGame
          * we must keep the last part holded.
          * **/
         private SnakeBodyPart _lastRemovedTail;
+        private LinkedList<Obstacle> _obstacles;
         private Food _food;
         private Direction _currentDirection;
 
         private int _userScore;
         private int _gameDelayAmount;
+
+        //STATES
         private bool _isBoostMode;
         private bool _isPaused;
+        private bool _hasObstacleSpawned;
 
         private CancellationTokenSource cancellationTokenSource;
 
@@ -69,6 +74,12 @@ namespace SnakeGame
                     Y = snakeBodyPartStartPointY
                 });
 
+
+            //Obstacles
+            //DO NOT CHANGE ORDER _obstacles and SpawnFood
+            //Because SpawnFood need to access _obstacles
+            _obstacles = new();
+
             //Spawn food at startup
             SpawnFood();
 
@@ -90,6 +101,7 @@ namespace SnakeGame
 
             _isBoostMode = false;
             _isPaused = false;
+            _hasObstacleSpawned = true;
         }
 
         private void MoveSnake(Direction snakeDirection)
@@ -129,6 +141,21 @@ namespace SnakeGame
             _snakeBodyParts.RemoveLast();
         }
 
+        private void SpawnObstacle()
+        {
+            Random obstacleSpawner = new();
+            int obstacleX = default;
+            int obstacleY = default;
+            do
+            {
+                obstacleX = obstacleSpawner.Next(BorderX + 1, BorderX + BorderWidth - 1);
+                obstacleY = obstacleSpawner.Next(BorderY + 1, BorderY + BorderHeight - 1);
+            } while (_snakeBodyParts.Any(spb => spb.X == obstacleX && spb.Y == obstacleY)
+                || _obstacles.Any(obs => obs.X == obstacleX && obs.Y == obstacleY));
+
+            _obstacles.AddFirst(new Obstacle(obstacleX, obstacleY));
+        }
+
         private void SpawnFood()
         {
             Random foodSpawner = new();
@@ -136,8 +163,9 @@ namespace SnakeGame
             {
                 _food.X = foodSpawner.Next(BorderX + 1, BorderX + BorderWidth - 1);
                 _food.Y = foodSpawner.Next(BorderY + 1, BorderY + BorderHeight - 1);
-            } while (_snakeBodyParts.Any(spb => spb.X == _food.X && spb.Y == _food.Y));
-            //Spawn food until food coords collides with any of the snake body parts
+            } while (_snakeBodyParts.Any(spb => spb.X == _food.X && spb.Y == _food.Y)
+                || _obstacles.Any(obs => obs.X == _food.X && obs.Y == _food.Y));
+            //Food that will be generated must not be on snake's body
         }
 
         private bool HasCollision()
@@ -148,13 +176,16 @@ namespace SnakeGame
                 spb.X == head.X &&
                 spb.Y == head.Y);
 
-            bool hasBorderCollision = _snakeBodyParts.Take(1).Any(spb =>
-                spb.X == BorderX ||
-                spb.X == BorderX + BorderWidth - 1 ||
-                spb.Y == BorderY ||
-                spb.Y == BorderY + BorderHeight - 1);
+            bool hasBorderCollision =
+                head.X == BorderX ||
+                head.X == BorderX + BorderWidth - 1 ||
+                head.Y == BorderY ||
+                head.Y == BorderY + BorderHeight - 1;
 
-            return hasBorderCollision || hasSelfCollision;
+            bool hasObstacleCollision = _obstacles.Any(obs =>
+                obs.X == head.X && obs.Y == head.Y);
+
+            return hasBorderCollision || hasSelfCollision || hasObstacleCollision;
         }
 
         private void HaveFoodEaten()
@@ -248,6 +279,8 @@ namespace SnakeGame
             {
                 ConsoleHelper.DrawSnakeBody(_snakeBodyParts, SnakeBodyChar, _currentDirection, _isBoostMode);
 
+                #region PAUSE_CONTROL
+
                 if (_isPaused)
                 {
                     ConsoleHelper.PrintPauseGame(BorderX, BorderY, BorderWidth, BorderHeight, BorderChar);
@@ -266,6 +299,10 @@ namespace SnakeGame
                     ConsoleHelper.DrawBorder(BorderX, BorderY, BorderWidth, BorderHeight, BorderChar);
                 }
 
+                #endregion
+
+                #region FOOD_CONTROL
+
                 if (_food.FoodEaten)
                 {
                     SpawnFood();
@@ -273,9 +310,29 @@ namespace SnakeGame
                 }
                 ConsoleHelper.DrawFood(_food, FoodChar);
 
+                #endregion
+
+                #region OBSTACLE_CONTROL
+
+                if (!_hasObstacleSpawned && _userScore % 5 == 0)
+                {
+                    SpawnObstacle();
+                    _hasObstacleSpawned = true;
+                }
+
+                if (_hasObstacleSpawned && _userScore % 5 != 0)
+                {
+                    _hasObstacleSpawned = false;
+                }
+
+                ConsoleHelper.DrawObstacles(_obstacles, ObstacleChar);
+
+                #endregion
+
                 await Task.Delay(_gameDelayAmount);
 
                 MoveSnake(_currentDirection);
+
                 if (HasCollision())
                 {
                     cancellationTokenSource.Cancel();
