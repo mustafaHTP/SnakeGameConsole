@@ -51,6 +51,7 @@ namespace SnakeGame
 
         //STATES
         private bool _isBoostMode;
+        private bool _isMute;
         private bool _isPaused;
         private bool _hasObstacleSpawned;
         private bool _isSnakeAIMode;
@@ -220,7 +221,10 @@ namespace SnakeGame
                 _food.FoodEaten = true;
                 ++_userScore;
                 _snakeBodyParts.AddLast(_lastRemovedTail);
-                AudioHelper.PlayEatEffect();
+                if (!_isMute)
+                {
+                    AudioHelper.PlayEatEffect();
+                }
                 return;
             }
 
@@ -229,7 +233,10 @@ namespace SnakeGame
             {
                 _food.FoodEaten = true;
                 _snakeAI._snakeBodyParts.AddLast(_snakeAI._lastRemovedTail);
-                AudioHelper.PlayEatEffectAI();
+                if (!_isMute)
+                {
+                    AudioHelper.PlayEatEffectAI();
+                }
             }
         }
 
@@ -295,6 +302,10 @@ namespace SnakeGame
                     case ConsoleKey.P:
                         _isPaused = !_isPaused;
                         break;
+                    case ConsoleKey.M:
+                        _isMute = !_isMute;
+                        break;
+
                 }
 
                 await Task.Delay(_gameDelayAmount);
@@ -411,8 +422,10 @@ namespace SnakeGame
 
                 //Set Game mode according to input
                 _isSnakeAIMode = gameModInput == ConsoleKey.E ? true : false;
-
-                AudioHelper.PlayStartGameEffect();
+                if (!_isMute)
+                {
+                    AudioHelper.PlayStartGameEffect();
+                }
                 Console.Clear();
 
                 var getInputTask = GetInputAsync();
@@ -420,7 +433,10 @@ namespace SnakeGame
 
                 await Task.WhenAll(gameLoopTask, getInputTask);
 
-                AudioHelper.PlayGameOverEffect();
+                if (!_isMute)
+                {
+                    AudioHelper.PlayGameOverEffect();
+                }
                 ConsoleHelper.PrintGameOver(BorderX, BorderY, BorderWidth, BorderHeight, BorderChar, _userScore);
 
                 ConsoleKey tryAgainInput = Console.ReadKey(true).Key;
