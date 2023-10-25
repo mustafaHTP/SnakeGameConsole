@@ -4,7 +4,8 @@ namespace SnakeGameConsole
 {
     internal static class ConsoleHelper
     {
-        internal static void DrawBorder(int borderX, int borderY, int borderWidth, int borderHeight, char borderChar)
+        internal static void DrawBorder(int borderX, int borderY, 
+            int borderWidth, int borderHeight, char borderChar)
         {
             Console.ForegroundColor = ConsoleColor.DarkRed;
 
@@ -40,8 +41,14 @@ namespace SnakeGameConsole
             Console.ForegroundColor = ConsoleColor.White;
         }
 
-        internal static void DrawSnakeBody(LinkedList<SnakeBodyPart> snakeBodyParts, char snakeBodyChar, Direction direction, bool isBoostMode)
+        internal static void DrawSnakeBody(LinkedList<SnakeBodyPart> snakeBodyParts, SnakeBodyPart lastRemovedTail, 
+            char snakeBodyChar, Direction direction, bool isBoostMode)
         {
+            //Fetch cursor to last part of snake
+            Console.SetCursorPosition(lastRemovedTail.X, lastRemovedTail.Y);
+            //Overwrite last part of snake body
+            Console.Write(' ');
+
             SnakeBodyPart head = snakeBodyParts.First();
             Console.SetCursorPosition(head.X, head.Y);
             Console.ForegroundColor = isBoostMode switch
@@ -78,18 +85,45 @@ namespace SnakeGameConsole
             Console.ForegroundColor = ConsoleColor.White;
         }
 
+        internal static void DrawSnakeBodyAI(LinkedList<SnakeBodyPart> snakeBodyParts, SnakeBodyPart lastRemovedTail,
+            char snakeBodyChar, Direction direction, bool isBoostMode)
+        {
+            //Fetch cursor to last part of snake
+            Console.SetCursorPosition(lastRemovedTail.X, lastRemovedTail.Y);
+            //Overwrite last part of snake body
+            Console.Write(' ');
+
+            SnakeBodyPart head = snakeBodyParts.First();
+            Console.SetCursorPosition(head.X, head.Y);
+            Console.ForegroundColor = isBoostMode switch
+            {
+                true => ConsoleColor.Magenta,
+                _ => ConsoleColor.Blue
+            };
+
+            Console.Write('O');
+
+            foreach (var item in snakeBodyParts.Skip(1))
+            {
+                Console.SetCursorPosition(item.X, item.Y);
+                Console.Write(snakeBodyChar);
+            }
+
+            Console.ForegroundColor = ConsoleColor.White;
+        }
+
         internal static void DrawFood(Food food, char foodChar)
         {
             Console.SetCursorPosition(food.X, food.Y);
             WriteWithColor(foodChar, ConsoleColor.Yellow);
         }
 
-        internal static void DrawObstacles(LinkedList<Obstacle> obstacles, char obstacleChar)
+        internal static void DrawObstacles(List<Obstacle> obstacles, char obstacleChar)
         {
             foreach (var obstacle in obstacles)
             {
                 Console.SetCursorPosition(obstacle.X, obstacle.Y);
-                WriteWithColor(obstacleChar, ConsoleColor.Magenta);
+                WriteWithColor(obstacleChar, ConsoleColor.DarkRed);
             }
         }
 
@@ -145,7 +179,8 @@ namespace SnakeGameConsole
             }
         }
 
-        internal static void PrintGameOver(int borderX, int borderY, int borderWidth, int borderHeight, char borderChar, int score)
+        internal static void PrintGameOver(int borderX, int borderY, 
+            int borderWidth, int borderHeight, char borderChar, int score)
         {
             Console.Clear();
             DrawBorder(borderX, borderY, borderWidth, borderHeight, borderChar);
@@ -176,7 +211,8 @@ namespace SnakeGameConsole
             WriteWithColor(tryAgainText, ConsoleColor.Yellow);
         }
 
-        internal static void PrintStartGame(int borderX, int borderY, int borderWidth, int borderHeight, char borderChar)
+        internal static void PrintStartGame(int borderX, int borderY, 
+            int borderWidth, int borderHeight, char borderChar)
         {
             Console.Clear();
             DrawBorder(borderX, borderY, borderWidth, borderHeight, borderChar);
@@ -184,16 +220,25 @@ namespace SnakeGameConsole
             int middleOfBorderX = (borderX + borderWidth) / 2 + 3;
             int middleOfBorderY = (borderY + borderHeight) / 2;
 
-            string startGameText = "...Press Any Key to START...";
+            string startGameText = "...Press Q to PLAY NORMAL MODE...";
 
             Console.SetCursorPosition(
                 middleOfBorderX - startGameText.Length / 2,
                 middleOfBorderY
                 );
             WriteWithColor(startGameText, ConsoleColor.Green);
+
+            string startGameText2 = "...Press E to PLAY AI MODE...";
+
+            Console.SetCursorPosition(
+                middleOfBorderX - startGameText2.Length / 2,
+                middleOfBorderY + 1
+                );
+            WriteWithColor(startGameText2, ConsoleColor.Blue);
         }
 
-        internal static void PrintPauseGame(int borderX, int borderY, int borderWidth, int borderHeight, char borderChar)
+        internal static void PrintPauseGame(int borderX, int borderY, 
+            int borderWidth, int borderHeight, char borderChar)
         {
             Console.Clear();
             DrawBorder(borderX, borderY, borderWidth, borderHeight, borderChar);

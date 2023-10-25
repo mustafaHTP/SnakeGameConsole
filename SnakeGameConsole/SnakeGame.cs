@@ -2,7 +2,7 @@
 
 namespace SnakeGame
 {
-    internal class SnakeGame
+    internal partial class SnakeGame
     {
         //BORDER CONSTANTS
         private const int BorderX = 5;
@@ -19,10 +19,10 @@ namespace SnakeGame
          * More details about special characters
          * https://theasciicode.com.ar/extended-ascii-code/bottom-half-block-ascii-code-220.html
          * **/
-        private const char BorderChar = '▄';
+        private const char BorderChar = '█';
         private const char FoodChar = '@';
         private const char SnakeBodyChar = '■';
-        private const char ObstacleChar = '▄';
+        private const char ObstacleChar = '█';
 
         //GAME DELAY CONSTANTS
         /*
@@ -41,9 +41,10 @@ namespace SnakeGame
          * we must keep the last part holded.
          * **/
         private SnakeBodyPart _lastRemovedTail;
-        private LinkedList<Obstacle> _obstacles;
+        private List<Obstacle> _obstacles;
         private Food _food;
         private Direction _currentDirection;
+        private SnakeAI _snakeAI;
 
         private int _userScore;
         private int _gameDelayAmount;
@@ -52,6 +53,7 @@ namespace SnakeGame
         private bool _isBoostMode;
         private bool _isPaused;
         private bool _hasObstacleSpawned;
+        private bool _isSnakeAIMode;
 
         private CancellationTokenSource cancellationTokenSource;
 
@@ -63,8 +65,10 @@ namespace SnakeGame
             //SNAKE DEFAULT VALUES
             //Get random position for snake at start
             Random snakeBodyPartSpawner = new();
-            int snakeBodyPartStartPointX = snakeBodyPartSpawner.Next(BorderX + 1, BorderX + BorderWidth - 1);
-            int snakeBodyPartStartPointY = snakeBodyPartSpawner.Next(BorderY + 1, BorderY + BorderHeight - 1);
+            int snakeBodyPartStartPointX =
+                snakeBodyPartSpawner.Next(BorderX + 1, BorderX + BorderWidth - 1 / 2);
+            int snakeBodyPartStartPointY =
+                snakeBodyPartSpawner.Next(BorderY + 1, BorderY + BorderHeight - 1 / 2);
 
             _snakeBodyParts = new();
             _snakeBodyParts.AddFirst(
@@ -99,6 +103,10 @@ namespace SnakeGame
             //GAME DEFAULT DELAY
             _gameDelayAmount = GameDefaultDelay;
 
+            //SNAKE AI 
+            _snakeAI = new();
+            _snakeAI.SetupSnakeAI(BorderX, BorderY, BorderWidth, BorderHeight);
+
             _isBoostMode = false;
             _isPaused = false;
             _hasObstacleSpawned = true;
@@ -106,11 +114,11 @@ namespace SnakeGame
 
         private void MoveSnake(Direction snakeDirection)
         {
-            //Fetch cursor to last part of snake
-            SnakeBodyPart lastSnakeBodyPart = _snakeBodyParts.Last();
-            Console.SetCursorPosition(lastSnakeBodyPart.X, lastSnakeBodyPart.Y);
-            //Overwrite last part of snake body
-            Console.Write(' ');
+            ////Fetch cursor to last part of snake
+            //SnakeBodyPart lastSnakeBodyPart = _snakeBodyParts.Last();
+            //Console.SetCursorPosition(lastSnakeBodyPart.X, lastSnakeBodyPart.Y);
+            ////Overwrite last part of snake body
+            //Console.Write(' ');
 
             //Move head according to direction
             SnakeBodyPart firstSnakeBodyPart = _snakeBodyParts.First();
@@ -153,7 +161,7 @@ namespace SnakeGame
             } while (_snakeBodyParts.Any(spb => spb.X == obstacleX && spb.Y == obstacleY)
                 || _obstacles.Any(obs => obs.X == obstacleX && obs.Y == obstacleY));
 
-            _obstacles.AddFirst(new Obstacle(obstacleX, obstacleY));
+            _obstacles.Add(new Obstacle(obstacleX, obstacleY));
         }
 
         private void SpawnFood()
@@ -182,28 +190,47 @@ namespace SnakeGame
                 head.Y == BorderY ||
                 head.Y == BorderY + BorderHeight - 1;
 
-            bool hasObstacleCollision = _obstacles.Any(obs =>
-                obs.X == head.X && obs.Y == head.Y);
+            bool hasObstacleCollision = false;
+            bool hasSnakeAICollision = false;
 
-            return hasBorderCollision || hasSelfCollision || hasObstacleCollision;
+            if (!_isSnakeAIMode)
+            {
+                hasObstacleCollision = _obstacles.Any(obs =>
+                    obs.X == head.X && obs.Y == head.Y);
+            }
+            else
+            {
+                bool hasSnakeCollideWithAI = _snakeAI._snakeBodyParts.
+                    Any(spb => spb.X == head.X && spb.Y == head.Y);
+
+                SnakeBodyPart headAI = _snakeAI._snakeBodyParts.First();
+                bool hasAICollideWithSnake = _snakeBodyParts.Any(spb => spb.X == headAI.X && spb.Y == headAI.Y);
+
+                hasSnakeAICollision = hasSnakeCollideWithAI || hasAICollideWithSnake ? true : false;
+            }
+
+            return hasBorderCollision || hasSelfCollision || hasObstacleCollision || hasSnakeAICollision;
         }
 
         private void HaveFoodEaten()
         {
-            if (_snakeBodyParts.First().X == _food.X && _snakeBodyParts.First().Y == _food.Y)
+            SnakeBodyPart head = _snakeBodyParts.First();
+            if (head.X == _food.X && head.Y == _food.Y)
             {
                 _food.FoodEaten = true;
                 ++_userScore;
                 _snakeBodyParts.AddLast(_lastRemovedTail);
                 AudioHelper.PlayEatEffect();
+                return;
             }
-        }
 
-        private void PrintDebugInfo()
-        {
-            Console.SetCursorPosition(0, 0);
-            Console.Write("Has Collision: " + HasCollision());
-            Console.Write(" Score:" + _userScore);
+            SnakeBodyPart headAI = _snakeAI._snakeBodyParts.First();
+            if (headAI.X == _food.X && headAI.Y == _food.Y)
+            {
+                _food.FoodEaten = true;
+                _snakeAI._snakeBodyParts.AddLast(_snakeAI._lastRemovedTail);
+                AudioHelper.PlayEatEffectAI();
+            }
         }
 
         private async Task GetInputAsync()
@@ -219,6 +246,7 @@ namespace SnakeGame
                 switch (snakeDirectionInput)
                 {
                     case ConsoleKey.LeftArrow:
+                    case ConsoleKey.A:
 
                         if (_currentDirection != Direction.Right)
                         {
@@ -226,6 +254,7 @@ namespace SnakeGame
                         }
                         break;
                     case ConsoleKey.RightArrow:
+                    case ConsoleKey.D:
 
                         if (_currentDirection != Direction.Left)
                         {
@@ -233,6 +262,7 @@ namespace SnakeGame
                         }
                         break;
                     case ConsoleKey.UpArrow:
+                    case ConsoleKey.W:
 
                         if (_currentDirection != Direction.Down)
                         {
@@ -240,6 +270,7 @@ namespace SnakeGame
                         }
                         break;
                     case ConsoleKey.DownArrow:
+                    case ConsoleKey.S:
 
                         if (_currentDirection != Direction.Up)
                         {
@@ -277,7 +308,21 @@ namespace SnakeGame
 
             while (!cancellationTokenSource.Token.IsCancellationRequested)
             {
-                ConsoleHelper.DrawSnakeBody(_snakeBodyParts, SnakeBodyChar, _currentDirection, _isBoostMode);
+                ConsoleHelper.DrawSnakeBody(_snakeBodyParts,
+                    _lastRemovedTail,
+                    SnakeBodyChar,
+                    _currentDirection,
+                    _isBoostMode);
+
+                if (_isSnakeAIMode)
+                {
+                    ConsoleHelper.DrawSnakeBodyAI(
+                        _snakeAI._snakeBodyParts,
+                        _snakeAI._lastRemovedTail,
+                        SnakeAI.snakeBodyChar,
+                        _snakeAI._currentDirection,
+                        _isBoostMode);
+                }
 
                 #region PAUSE_CONTROL
 
@@ -314,24 +359,31 @@ namespace SnakeGame
 
                 #region OBSTACLE_CONTROL
 
-                if (!_hasObstacleSpawned && _userScore % 5 == 0)
+                if (!_isSnakeAIMode)
                 {
-                    SpawnObstacle();
-                    _hasObstacleSpawned = true;
-                }
+                    if (!_hasObstacleSpawned && _userScore % 5 == 0)
+                    {
+                        SpawnObstacle();
+                        _hasObstacleSpawned = true;
+                    }
 
-                if (_hasObstacleSpawned && _userScore % 5 != 0)
-                {
-                    _hasObstacleSpawned = false;
-                }
+                    if (_hasObstacleSpawned && _userScore % 5 != 0)
+                    {
+                        _hasObstacleSpawned = false;
+                    }
 
-                ConsoleHelper.DrawObstacles(_obstacles, ObstacleChar);
+                    ConsoleHelper.DrawObstacles(_obstacles, ObstacleChar);
+                }
 
                 #endregion
 
                 await Task.Delay(_gameDelayAmount);
 
                 MoveSnake(_currentDirection);
+                if (_isSnakeAIMode)
+                {
+                    _snakeAI.MoveSnake(_food);
+                }
 
                 if (HasCollision())
                 {
@@ -340,7 +392,6 @@ namespace SnakeGame
 
                 HaveFoodEaten();
             }
-
         }
 
         public async Task Run()
@@ -351,11 +402,18 @@ namespace SnakeGame
                 SetupGame();
                 ConsoleHelper.PrintStartGame(BorderX, BorderY, BorderWidth, BorderHeight, BorderChar);
 
-                //To block thread at start screen
-                Console.ReadKey(true);
-                Console.Clear();
+                //Get Game Mode
+                ConsoleKey gameModInput = Console.ReadKey(true).Key;
+                while (gameModInput != ConsoleKey.Q && gameModInput != ConsoleKey.E)
+                {
+                    gameModInput = Console.ReadKey(true).Key;
+                }
+
+                //Set Game mode according to input
+                _isSnakeAIMode = gameModInput == ConsoleKey.E ? true : false;
 
                 AudioHelper.PlayStartGameEffect();
+                Console.Clear();
 
                 var getInputTask = GetInputAsync();
                 var gameLoopTask = GameLoopAsync();

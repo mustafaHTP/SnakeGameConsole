@@ -8,6 +8,7 @@ namespace SnakeGameConsole
         static string soundEffectsPath = Path.Combine(baseDirectoryPath, "..", "..", "..", "SoundEffects");
 
         static string eatEffectFileName = "eat_effect.wav";
+        static string eatEffectAIFileName = "eat_effect_ai.wav";
         static string gameOverEffectFileName = "game_over.wav";
         static string startGameEffectFileName = "start_game.wav";
 
@@ -17,6 +18,30 @@ namespace SnakeGameConsole
             if (File.Exists(eatEffectPath))
             {
                 using var audioFile = new AudioFileReader(eatEffectPath);
+                using var outputDevice = new WaveOutEvent();
+
+                outputDevice.Init(audioFile);
+                outputDevice.Play();
+
+                //Get the duration of audio file to 
+                //prevent stopping audio file
+                double duration = audioFile.TotalTime.TotalSeconds;
+                double durationInMiliseconds = duration * 1000;
+
+                Thread.Sleep((int)durationInMiliseconds);
+            }
+            else
+            {
+                throw new FileNotFoundException();
+            }
+        }
+
+        internal static void PlayEatEffectAI()
+        {
+            string eatEffectAIPath = Path.Combine(soundEffectsPath, eatEffectAIFileName);
+            if (File.Exists(eatEffectAIPath))
+            {
+                using var audioFile = new AudioFileReader(eatEffectAIPath);
                 using var outputDevice = new WaveOutEvent();
 
                 outputDevice.Init(audioFile);
