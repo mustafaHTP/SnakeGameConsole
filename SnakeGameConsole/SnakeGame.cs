@@ -67,9 +67,9 @@ namespace SnakeGame
             //Get random position for snake at start
             Random snakeBodyPartSpawner = new();
             int snakeBodyPartStartPointX =
-                snakeBodyPartSpawner.Next(BorderX + 1, BorderX + BorderWidth - 1 / 2);
+                snakeBodyPartSpawner.Next(BorderX + 1, (BorderX + BorderWidth - 1) / 2);
             int snakeBodyPartStartPointY =
-                snakeBodyPartSpawner.Next(BorderY + 1, BorderY + BorderHeight - 1 / 2);
+                snakeBodyPartSpawner.Next(BorderY + 1, (BorderY + BorderHeight - 1) / 2);
 
             _snakeBodyParts = new();
             _snakeBodyParts.AddFirst(
