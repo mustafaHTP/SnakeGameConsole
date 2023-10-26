@@ -2,6 +2,12 @@
 
 Basic snake game in C#
 
+> !! IMPORTANT: To play game appropriately, use **windows terminal app** and be sure game's border fits into your buffer.
+>>
+>> * Windows terminal app > Startup > Set Launch Size
+>> * Windows terminal app > Appearance > Font Size
+>> * You could zoom in/out.
+
 ## Libraries Used
 
 **NAudio** used for game sounds.
