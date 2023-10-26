@@ -2,7 +2,7 @@
 
 namespace SnakeGame
 {
-    internal partial class SnakeGame
+    internal class SnakeGame
     {
         //BORDER CONSTANTS
         private const int BorderX = 5;
@@ -61,7 +61,10 @@ namespace SnakeGame
         private void SetupGame()
         {
             Console.Clear();
-            Console.SetBufferSize(ConsoleBufferWidth, ConsoleBufferHeight);
+            if (OperatingSystem.IsWindows())
+            {
+                Console.SetBufferSize(ConsoleBufferWidth, ConsoleBufferHeight);
+            }
 
             //SNAKE DEFAULT VALUES
             //Get random position for snake at start
