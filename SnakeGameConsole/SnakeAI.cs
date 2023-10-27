@@ -4,7 +4,7 @@ namespace SnakeGameConsole
 {
     internal class SnakeAI
     {
-        internal const char snakeBodyChar = '*';
+        internal const char snakeBodyChar = '■';
 
         internal LinkedList<SnakeBodyPart> _snakeBodyParts;
         internal SnakeBodyPart _lastRemovedTail;
