@@ -12,8 +12,10 @@ namespace SnakeGameConsole
         static string gameOverEffectFileName = "game_over.wav";
         static string startGameEffectFileName = "start_game.wav";
 
-        internal static void PlayEatEffect()
+        internal static void PlayEatEffect(bool isMute)
         {
+            if (isMute) return;
+
             string eatEffectPath = Path.Combine(soundEffectsPath, eatEffectFileName);
             if (File.Exists(eatEffectPath))
             {
@@ -36,8 +38,10 @@ namespace SnakeGameConsole
             }
         }
 
-        internal static void PlayEatEffectAI()
+        internal static void PlayEatEffectAI(bool isMute)
         {
+            if (isMute) return;
+
             string eatEffectAIPath = Path.Combine(soundEffectsPath, eatEffectAIFileName);
             if (File.Exists(eatEffectAIPath))
             {
@@ -60,8 +64,10 @@ namespace SnakeGameConsole
             }
         }
 
-        internal static void PlayGameOverEffect()
+        internal static void PlayGameOverEffect(bool isMute)
         {
+            if (isMute) return;
+
             string gameOverEffectPath = Path.Combine(soundEffectsPath, gameOverEffectFileName);
             if (File.Exists(gameOverEffectPath))
             {
@@ -84,8 +90,10 @@ namespace SnakeGameConsole
             }
         }
 
-        internal static void PlayStartGameEffect()
+        internal static void PlayStartGameEffect(bool isMute)
         {
+            if (isMute) return;
+
             string startGameEffectPath = Path.Combine(soundEffectsPath, startGameEffectFileName);
             if (File.Exists(startGameEffectPath))
             {

@@ -29,7 +29,7 @@ namespace SnakeGame
          * Values that between 50 and 100 are fine 
          * for smooth gameplay
          * **/
-        private const int GameDefaultDelay = 75;
+        private const int GameDefaultDelay = 65;
         private const int GameBoostDelay = GameDefaultDelay / 3;
 
         private LinkedList<SnakeBodyPart> _snakeBodyParts;
@@ -224,10 +224,7 @@ namespace SnakeGame
                 _food.FoodEaten = true;
                 ++_userScore;
                 _snakeBodyParts.AddLast(_lastRemovedTail);
-                if (!_isMute)
-                {
-                    AudioHelper.PlayEatEffect();
-                }
+                AudioHelper.PlayEatEffect(_isMute);
                 return;
             }
 
@@ -236,10 +233,7 @@ namespace SnakeGame
             {
                 _food.FoodEaten = true;
                 _snakeAI._snakeBodyParts.AddLast(_snakeAI._lastRemovedTail);
-                if (!_isMute)
-                {
-                    AudioHelper.PlayEatEffectAI();
-                }
+                AudioHelper.PlayEatEffectAI(_isMute);
             }
         }
 
@@ -425,10 +419,9 @@ namespace SnakeGame
 
                 //Set Game mode according to input
                 _isSnakeAIMode = gameModInput == ConsoleKey.E ? true : false;
-                if (!_isMute)
-                {
-                    AudioHelper.PlayStartGameEffect();
-                }
+
+                AudioHelper.PlayStartGameEffect(_isMute);
+
                 Console.Clear();
 
                 var getInputTask = GetInputAsync();
@@ -436,10 +429,8 @@ namespace SnakeGame
 
                 await Task.WhenAll(gameLoopTask, getInputTask);
 
-                if (!_isMute)
-                {
-                    AudioHelper.PlayGameOverEffect();
-                }
+                AudioHelper.PlayGameOverEffect(_isMute);
+
                 ConsoleHelper.PrintGameOver(BorderX, BorderY, BorderWidth, BorderHeight, BorderChar, _userScore);
 
                 ConsoleKey tryAgainInput = Console.ReadKey(true).Key;
