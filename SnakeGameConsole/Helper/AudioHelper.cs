@@ -4,19 +4,20 @@ namespace SnakeGameConsole
 {
     internal static class AudioHelper
     {
-        static string baseDirectoryPath = Environment.CurrentDirectory;
-        static string soundEffectsPath = Path.Combine(baseDirectoryPath, "..", "..", "..", "SoundEffects");
+        static readonly string BaseDirectoryPath = Environment.CurrentDirectory;
+        static readonly string SfxFolderName = "SFX";
+        static readonly string SfxFolderPath = Path.Combine(BaseDirectoryPath, SfxFolderName);
 
-        static string eatEffectFileName = "eat_effect.wav";
-        static string eatEffectAIFileName = "eat_effect_ai.wav";
-        static string gameOverEffectFileName = "game_over.wav";
-        static string startGameEffectFileName = "start_game.wav";
+        static readonly string EatSfxFileName = "sfx_eat.wav";
+        static readonly string EatSfxAIFileName = "sfx_eat_ai.wav";
+        static readonly string GameOverSfxFileName = "sfx_game_over.wav";
+        static readonly string StartGameSfxFileName = "sfx_start_game.wav";
 
         internal static void PlayEatEffect(bool isMute)
         {
             if (isMute) return;
 
-            string eatEffectPath = Path.Combine(soundEffectsPath, eatEffectFileName);
+            string eatEffectPath = Path.Combine(SfxFolderPath, EatSfxFileName);
             if (File.Exists(eatEffectPath))
             {
                 using var audioFile = new AudioFileReader(eatEffectPath);
@@ -42,7 +43,7 @@ namespace SnakeGameConsole
         {
             if (isMute) return;
 
-            string eatEffectAIPath = Path.Combine(soundEffectsPath, eatEffectAIFileName);
+            string eatEffectAIPath = Path.Combine(SfxFolderPath, EatSfxAIFileName);
             if (File.Exists(eatEffectAIPath))
             {
                 using var audioFile = new AudioFileReader(eatEffectAIPath);
@@ -68,7 +69,7 @@ namespace SnakeGameConsole
         {
             if (isMute) return;
 
-            string gameOverEffectPath = Path.Combine(soundEffectsPath, gameOverEffectFileName);
+            string gameOverEffectPath = Path.Combine(SfxFolderPath, GameOverSfxFileName);
             if (File.Exists(gameOverEffectPath))
             {
                 using var audioFile = new AudioFileReader(gameOverEffectPath);
@@ -94,7 +95,7 @@ namespace SnakeGameConsole
         {
             if (isMute) return;
 
-            string startGameEffectPath = Path.Combine(soundEffectsPath, startGameEffectFileName);
+            string startGameEffectPath = Path.Combine(SfxFolderPath, StartGameSfxFileName);
             if (File.Exists(startGameEffectPath))
             {
                 using var audioFile = new AudioFileReader(startGameEffectPath);
